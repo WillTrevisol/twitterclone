@@ -15,4 +15,5 @@ class AssetsConstants {
   static const String likeFilledIcon = '$_svgsPath/like_filled.svg';
   static const String viewsIcon = '$_svgsPath/views.svg';
   static const String verifiedIcon = '$_svgsPath/verified.svg';
+  static const String addTweet = '$_svgsPath/add_tweet.svg';
 }

@@ -60,5 +60,18 @@ class AuthRepository implements IAuthRepository {
       return left(Failure(e.toString(), stackTrace));
     }
   }
+  
+  @override
+  Future<model.Account?> getCurrentUserAccount() async {
+    try {
+      return await _account.get();
+    } on AppwriteException catch (e) {
+      log(e.toString());
+      return null;
+    } catch (e) {
+      log(e.toString());
+      return null;
+    }
+  }
 
 }
