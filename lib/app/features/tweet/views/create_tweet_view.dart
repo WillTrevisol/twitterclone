@@ -1,11 +1,16 @@
+import 'dart:io';
+
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:twitterclone/app/features/auth/controller/auth_controller.dart';
+import 'package:twitterclone/app/features/tweet/controller/tweet_controller.dart';
 import 'package:twitterclone/app/theme/pallete.dart';
 import 'package:twitterclone/app/widgets/deafult_loading.dart';
 import 'package:twitterclone/app/widgets/default_button.dart';
 import 'package:twitterclone/data/constants/assets_constans.dart';
+import 'package:twitterclone/data/core/utils.dart';
 
 class CreateTweetView extends ConsumerStatefulWidget {
   static route() => MaterialPageRoute(
@@ -20,6 +25,7 @@ class CreateTweetView extends ConsumerStatefulWidget {
 class _CreateTweetViewState extends ConsumerState<CreateTweetView> {
 
   final TextEditingController tweetController = TextEditingController();
+  List<File> images = [];
 
   @override
   void dispose() {
@@ -27,13 +33,25 @@ class _CreateTweetViewState extends ConsumerState<CreateTweetView> {
     tweetController.dispose();
   }
 
+  void onPickImages() async {
+    images = await pickImages();
+    setState((){});
+  }
+
+  void shareTweet() {
+    ref.read(tweetControllerProvider.notifier)
+      .shareTweet(context: context, images: images, text: tweetController.text);
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(currentUserDataProvider).value;
+    final isLoading = ref.watch(tweetControllerProvider);
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => isLoading ? null : Navigator.pop(context),
           icon: const Icon(
             Icons.close, 
             size: 30,
@@ -41,14 +59,14 @@ class _CreateTweetViewState extends ConsumerState<CreateTweetView> {
         ),
         actions: <Widget> [
           DefaultButton(
-            onPressed: () {}, 
+            onPressed: isLoading ? null : shareTweet,
             label: 'Tweet', 
             backgroundColor: Pallete.blueColor, 
             labelColor: Pallete.whiteColor,
           ),
         ],
       ),
-      body: user == null ? const DefaultLoading() : SafeArea(
+      body: isLoading || user == null ? const DefaultLoading() : SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: <Widget> [
@@ -81,6 +99,21 @@ class _CreateTweetViewState extends ConsumerState<CreateTweetView> {
                   ),
                 ],
               ),
+              if (images.isNotEmpty)
+                CarouselSlider(
+                  items: images.map((file) {
+                      return Container(
+                        width: MediaQuery.of(context).size.width,
+                        margin: const EdgeInsets.symmetric(horizontal: 5),
+                        child: Image.file(file),
+                      );
+                    } ,
+                  ).toList(), 
+                  options: CarouselOptions(
+                    height: 400,
+                    enableInfiniteScroll: false,
+                  ),
+                ),
             ],
           ),
         ),
@@ -99,7 +132,10 @@ class _CreateTweetViewState extends ConsumerState<CreateTweetView> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget> [
-              SvgPicture.asset(AssetsConstants.galleryIcon),
+              GestureDetector(
+                onTap: onPickImages,
+                child: SvgPicture.asset(AssetsConstants.galleryIcon),
+              ),
               SvgPicture.asset(AssetsConstants.gifIcon),
               SvgPicture.asset(AssetsConstants.emojiIcon),
             ],
