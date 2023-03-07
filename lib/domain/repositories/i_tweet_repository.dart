@@ -8,5 +8,7 @@ abstract class ITweetRepository {
   FutureEither<Document> shareTweet(Tweet tweet);
   FutureEither<List<Document>> getTweets();
   Stream<RealtimeMessage> getLatestTweet();
+  FutureEither<Document> likeTweet(Tweet tweet);
+  FutureEither<Document> reshareCount(Tweet tweet);
 
 }

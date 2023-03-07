@@ -15,6 +15,7 @@ class Tweet {
   final TweetType type;
   final DateTime createdAt;
   final int reshareCount;
+  final String retweetedBy;
   const Tweet({
     required this.id,
     required this.userId,
@@ -27,6 +28,7 @@ class Tweet {
     required this.type,
     required this.createdAt,
     required this.reshareCount,
+    required this.retweetedBy,
   });
 
 
@@ -42,6 +44,7 @@ class Tweet {
     TweetType? type,
     DateTime? createdAt,
     int? reshareCount,
+    String? retweetedBy,
   }) {
     return Tweet(
       id: id ?? this.id,
@@ -55,6 +58,7 @@ class Tweet {
       type: type ?? this.type,
       createdAt: createdAt ?? this.createdAt,
       reshareCount: reshareCount ?? this.reshareCount,
+      retweetedBy: retweetedBy ?? this.retweetedBy,
     );
   }
 
@@ -70,6 +74,7 @@ class Tweet {
       'type': type.type,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'reshareCount': reshareCount,
+      'retweetedBy': retweetedBy,
     };
   }
 
@@ -86,11 +91,12 @@ class Tweet {
       type: (map['type'] as String).toTweetTypeEnum(),
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
       reshareCount: map['reshareCount'] as int,
+      retweetedBy: map['retweetedBy'] as String,
     );
   }
 
   @override
   String toString() {
-    return 'Tweet(id: $id, userId: $userId, text: $text, link: $link, hashtags: $hashtags, imagesLinks: $imagesLinks, likes: $likes, comments: $comments, type: $type, createdAt: $createdAt, reshareCount: $reshareCount)';
+    return 'Tweet(id: $id, userId: $userId, text: $text, link: $link, hashtags: $hashtags, imagesLinks: $imagesLinks, likes: $likes, comments: $comments, type: $type, createdAt: $createdAt, reshareCount: $reshareCount, retweetedBy: $retweetedBy)';
   }
 }

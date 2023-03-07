@@ -79,5 +79,53 @@ class TweetRepository implements ITweetRepository {
       'databases.${AppWriteConstants.databaseId}.collections.${AppWriteConstants.tweetsColletionId}.documents',
     ]).stream;
   }
+  
+  @override
+  FutureEither<Document> likeTweet(Tweet tweet) async {
+    try {
+      final document = await _databases.updateDocument(
+        databaseId: AppWriteConstants.databaseId,
+        collectionId: AppWriteConstants.tweetsColletionId,
+        documentId: tweet.id,
+        data: {
+          'likes': tweet.likes,
+        },
+      );
 
+      return right(document);
+    } on AppwriteException catch (error, stackTrace) {
+      log(error.toString());
+
+      return left(Failure(error.message ?? 'Some unexpected error ocurred.', stackTrace));
+    } catch (error, stackTrace) {
+      log(error.toString());
+
+      return left(Failure(error.toString(), stackTrace));
+    }
+  }
+  
+  @override
+  FutureEither<Document> reshareCount(Tweet tweet) async {
+    try {
+      final document = await _databases.updateDocument(
+        databaseId: AppWriteConstants.databaseId,
+        collectionId: AppWriteConstants.tweetsColletionId,
+        documentId: tweet.id,
+        data: {
+          'reshareCount': tweet.reshareCount,
+        },
+      );
+
+      return right(document);
+    } on AppwriteException catch (error, stackTrace) {
+      log(error.toString());
+
+      return left(Failure(error.message ?? 'Some unexpected error ocurred.', stackTrace));
+    } catch (error, stackTrace) {
+      log(error.toString());
+
+      return left(Failure(error.toString(), stackTrace));
+    }
+  }
+  
 }

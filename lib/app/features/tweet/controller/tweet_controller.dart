@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:appwrite/appwrite.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:twitterclone/app/features/auth/controller/auth_controller.dart';
@@ -8,6 +9,7 @@ import 'package:twitterclone/data/core/utils.dart';
 import 'package:twitterclone/data/repositories/storage_repository.dart';
 import 'package:twitterclone/data/repositories/tweet_repository.dart';
 import 'package:twitterclone/domain/entities/tweet.dart';
+import 'package:twitterclone/domain/entities/user.dart';
 
 final tweetControllerProvider = StateNotifierProvider<TweetController, bool>(
   (StateNotifierProviderRef ref) {
@@ -98,6 +100,7 @@ class TweetController extends StateNotifier<bool> {
       type: TweetType.image, 
       createdAt: DateTime.now(), 
       reshareCount: 0,
+      retweetedBy: '',
     );
 
     final response = await _tweetRepository.shareTweet(tweet);
@@ -131,6 +134,7 @@ class TweetController extends StateNotifier<bool> {
       type: TweetType.text, 
       createdAt: DateTime.now(), 
       reshareCount: 0,
+      retweetedBy: '',
     );
 
     final response = await _tweetRepository.shareTweet(tweet);
@@ -179,4 +183,57 @@ class TweetController extends StateNotifier<bool> {
 
     return tweets;
   }
+
+  void likeTweet({required BuildContext context, required Tweet tweet, required User user}) async {
+    List<String> likes = tweet.likes;
+
+    if (tweet.likes.contains(user.id)) {
+      likes.remove(user.id);
+    } else {
+      likes.add(user.id);
+    }
+
+    tweet = tweet.copyWith(
+      likes: likes,
+    );
+
+    final response = await _tweetRepository.likeTweet(tweet);
+    response.fold(
+      (left) => null, 
+      (right) => null,
+    );
+  }
+
+  void reshareTweet({
+    required BuildContext context, 
+    required Tweet tweet, 
+    required User user,
+  }) async {
+    tweet = tweet.copyWith(
+      retweetedBy: user.name,
+      likes: [],
+      comments: [],
+      reshareCount: tweet.reshareCount + 1,
+    );
+
+    final response = await _tweetRepository.reshareCount(tweet);
+    response.fold(
+      (left) => showSnackBar(context: context, content: left.message, isError: true), 
+      (right) async {
+        tweet = tweet.copyWith(
+          id: ID.unique(),
+          reshareCount: 0,
+          createdAt: DateTime.now(),
+        );
+        final retweetResponse = await _tweetRepository.shareTweet(tweet);
+
+        retweetResponse.fold(
+          (left) => showSnackBar(context: context, content: left.message, isError: true), 
+          (right) => showSnackBar(context: context, content: 'Retweeted :D'),
+        );
+      },
+    );
+  }
+
+
 }
