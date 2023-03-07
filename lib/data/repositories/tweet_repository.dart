@@ -12,16 +12,20 @@ import 'package:twitterclone/domain/repositories/i_tweet_repository.dart';
 final tweetRepositoryProvider = Provider(
   (ProviderRef ref) {
     final databases = ref.watch(appWriteDatabaseProvider);
-    return TweetRepository(databases: databases);
+    final realtime = ref.watch(realtimeProvider);
+    return TweetRepository(databases: databases, realtime: realtime);
 });
 
 class TweetRepository implements ITweetRepository {
 
   final Databases _databases;
+  final Realtime _realtime;
 
   TweetRepository({
     required Databases databases,
-  }) : _databases = databases;
+    required Realtime realtime,
+  }) : _databases = databases,
+  _realtime = realtime;
 
   @override
   FutureEither<Document> shareTweet(Tweet tweet) async {
@@ -51,6 +55,9 @@ class TweetRepository implements ITweetRepository {
       final documents = await _databases.listDocuments(
       databaseId: AppWriteConstants.databaseId, 
       collectionId: AppWriteConstants.tweetsColletionId,
+      queries: [
+        Query.orderDesc('createdAt'),
+      ],
     );
 
     return right(documents.documents);
@@ -64,6 +71,13 @@ class TweetRepository implements ITweetRepository {
       return left(Failure(error.toString(), stackTrace));
     }
     
+  }
+  
+  @override
+  Stream<RealtimeMessage> getLatestTweet() {
+    return _realtime.subscribe([
+      'databases.${AppWriteConstants.databaseId}.collections.${AppWriteConstants.tweetsColletionId}.documents',
+    ]).stream;
   }
 
 }

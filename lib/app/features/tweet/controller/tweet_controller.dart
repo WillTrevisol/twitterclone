@@ -26,6 +26,12 @@ final getTweetsProvider = FutureProvider.family(
     return tweetController.getTweets(context);
 });
 
+final getLatestTweetProvider = StreamProvider.autoDispose(
+  (StreamProviderRef ref) {
+    final tweetRepository = ref.watch(tweetRepositoryProvider);
+    return tweetRepository.getLatestTweet();
+});
+
 class TweetController extends StateNotifier<bool> {
   TweetController({
     required Ref ref,
