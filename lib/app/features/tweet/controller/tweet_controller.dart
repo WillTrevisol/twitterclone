@@ -20,6 +20,12 @@ final tweetControllerProvider = StateNotifierProvider<TweetController, bool>(
     );
 });
 
+final getTweetsProvider = FutureProvider.family(
+  (FutureProviderRef ref, BuildContext context) async {
+    final tweetController = ref.watch(tweetControllerProvider.notifier);
+    return tweetController.getTweets(context);
+});
+
 class TweetController extends StateNotifier<bool> {
   TweetController({
     required Ref ref,
@@ -83,7 +89,7 @@ class TweetController extends StateNotifier<bool> {
       imagesLinks: imagesLinks, 
       likes: const [], 
       comments: const [], 
-      type: TweetType.text, 
+      type: TweetType.image, 
       createdAt: DateTime.now(), 
       reshareCount: 0,
     );
@@ -152,5 +158,19 @@ class TweetController extends StateNotifier<bool> {
     }
 
     return hashtags;
+  }
+
+  Future<List<Tweet>> getTweets(BuildContext context) async {
+    List<Tweet> tweets = [];
+    final response = await _tweetRepository.getTweets();
+
+    response.fold(
+      (left) => showSnackBar(context: context, content: left.message, isError: true), 
+      (right) {
+        tweets = right.map((tweet) => Tweet.fromMap(tweet.data)).toList();
+      },
+    );
+
+    return tweets;
   }
 }

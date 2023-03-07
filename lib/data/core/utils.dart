@@ -34,3 +34,7 @@ Future<List<File>> pickImages() async {
 
   return images;
 }
+
+String getUserNickFromEmail(String email) {
+  return email.split('@')[0];
+}

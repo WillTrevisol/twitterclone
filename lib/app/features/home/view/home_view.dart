@@ -62,6 +62,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
           BottomNavigationBarItem(
             icon: SvgPicture.asset(
               AssetsConstants.searchIcon,
+              height: _page == 1 ? 32 : null,
               colorFilter: const ColorFilter.mode(Pallete.whiteColor, BlendMode.srcIn),
             ),
           ),

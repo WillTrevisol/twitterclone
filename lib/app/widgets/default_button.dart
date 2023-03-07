@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class DefaultButton extends StatelessWidget {
   const DefaultButton({
     super.key, 
-    required this.onPressed, 
+    this.onPressed, 
     required this.label, 
     required this.backgroundColor, 
     required this.labelColor,
   });
 
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final String label;
   final Color backgroundColor;
   final Color labelColor;

@@ -9,6 +9,7 @@ import 'package:twitterclone/app/features/tweet/controller/tweet_controller.dart
 import 'package:twitterclone/app/theme/pallete.dart';
 import 'package:twitterclone/app/widgets/deafult_loading.dart';
 import 'package:twitterclone/app/widgets/default_button.dart';
+import 'package:twitterclone/app/widgets/default_circle_avatar.dart';
 import 'package:twitterclone/data/constants/assets_constans.dart';
 import 'package:twitterclone/data/core/utils.dart';
 
@@ -72,10 +73,8 @@ class _CreateTweetViewState extends ConsumerState<CreateTweetView> {
             children: <Widget> [
               Row(
                 children: <Widget> [
-                  CircleAvatar(
-                    backgroundImage: NetworkImage(
-                      user.profilePicture,
-                    ),
+                  DefaultCircleAvatar(
+                    profilePicure: user.profilePicture, 
                     radius: 30,
                   ),
                   const SizedBox(width: 15),

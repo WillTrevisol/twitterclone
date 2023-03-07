@@ -5,5 +5,5 @@ import 'package:twitterclone/domain/entities/tweet.dart';
 abstract class ITweetRepository {
 
   FutureEither<Document> shareTweet(Tweet tweet);
-
+  FutureEither<List<Document>> getTweets();
 }

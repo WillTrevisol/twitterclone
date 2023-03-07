@@ -44,5 +44,26 @@ class TweetRepository implements ITweetRepository {
       return left(Failure(error.toString(), stackTrace));
     }
   }
+  
+  @override
+  FutureEither<List<Document>> getTweets() async {
+    try {
+      final documents = await _databases.listDocuments(
+      databaseId: AppWriteConstants.databaseId, 
+      collectionId: AppWriteConstants.tweetsColletionId,
+    );
+
+    return right(documents.documents);
+    } on AppwriteException catch (error, stackTrace) {
+      log(error.toString());
+
+      return left(Failure(error.message ?? 'Some unexpected error ocurred.', stackTrace));
+    } catch (error, stackTrace) {
+      log(error.toString());
+
+      return left(Failure(error.toString(), stackTrace));
+    }
+    
+  }
 
 }
