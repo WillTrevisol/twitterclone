@@ -53,6 +53,7 @@ class TweetController extends StateNotifier<bool> {
     required BuildContext context,
     required List<File> images,
     required String text,
+    required String repliedTo,
   }) {
     if (text.isEmpty) {
       showSnackBar(context: context, content: 'Please enter some message', isError: true);
@@ -60,17 +61,18 @@ class TweetController extends StateNotifier<bool> {
     }
 
     if (images.isNotEmpty) {
-      _shareImagesTweet(context: context, images: images, text: text);
+      _shareImagesTweet(context: context, images: images, text: text, repliedTo: repliedTo);
       return;
     }
 
-    _shareTextTweet(context: context, text: text);
+    _shareTextTweet(context: context, text: text, repliedTo: repliedTo);
   }
 
   void _shareImagesTweet({
     required BuildContext context,
     required List<File> images,
     required String text,
+    required String repliedTo,
   }) async {
     state = true;
 
@@ -101,6 +103,7 @@ class TweetController extends StateNotifier<bool> {
       createdAt: DateTime.now(), 
       reshareCount: 0,
       retweetedBy: '',
+      repliedTo: repliedTo,
     );
 
     final response = await _tweetRepository.shareTweet(tweet);
@@ -115,6 +118,7 @@ class TweetController extends StateNotifier<bool> {
   void _shareTextTweet({
     required BuildContext context,
     required String text,
+    required String repliedTo,
   }) async {
     state = true;
 
@@ -135,6 +139,7 @@ class TweetController extends StateNotifier<bool> {
       createdAt: DateTime.now(), 
       reshareCount: 0,
       retweetedBy: '',
+      repliedTo: repliedTo,
     );
 
     final response = await _tweetRepository.shareTweet(tweet);
@@ -173,6 +178,20 @@ class TweetController extends StateNotifier<bool> {
   Future<List<Tweet>> getTweets(BuildContext context) async {
     List<Tweet> tweets = [];
     final response = await _tweetRepository.getTweets();
+
+    response.fold(
+      (left) => showSnackBar(context: context, content: left.message, isError: true), 
+      (right) {
+        tweets = right.map((tweet) => Tweet.fromMap(tweet.data)).toList();
+      },
+    );
+
+    return tweets;
+  }
+
+  Future<List<Tweet>> getTweetComments(BuildContext context, Tweet tweet) async {
+    List<Tweet> tweets = [];
+    final response = await _tweetRepository.getTweetComments(tweet);
 
     response.fold(
       (left) => showSnackBar(context: context, content: left.message, isError: true), 

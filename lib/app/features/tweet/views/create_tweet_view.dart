@@ -41,7 +41,7 @@ class _CreateTweetViewState extends ConsumerState<CreateTweetView> {
 
   void shareTweet() {
     ref.read(tweetControllerProvider.notifier)
-      .shareTweet(context: context, images: images, text: tweetController.text);
+      .shareTweet(context: context, images: images, text: tweetController.text, repliedTo:'');
     Navigator.pop(context);
   }
 
